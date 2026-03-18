@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>安装 Trae CN 插件</title>
+ <style>
+ *{margin:0;padding:0;box-sizing:border-box}
+ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#0a0a0a;color:#e0e0e0;min-height:100vh;display:flex;align-items:center;justify-content:center}
+ .container{text-align:center;max-width:520px;padding:40px 24px}
+ .icon{width:72px;height:72px;margin:0 auto 24px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:36px}
+ h1{font-size:22px;font-weight:600;margin-bottom:8px;color:#fff}
+ .ext-name{color:#a78bfa;font-family:"SF Mono",Monaco,monospace;font-size:14px;margin-bottom:24px;background:#18181b;padding:6px 14px;border-radius:6px;display:inline-block}
+ .status{font-size:15px;color:#9ca3af;margin-bottom:24px;min-height:24px}
+ .status.fail{color:#f87171}
+ .btn{display:inline-block;padding:12px 32px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:500;cursor:pointer;text-decoration:none;transition:opacity .2s}
+ .btn:hover{opacity:.85}
+ .btn.secondary{background:#27272a;border:1px solid #3f3f46;margin-top:12px}
+ .help{margin-top:32px;padding-top:24px;border-top:1px solid #27272a;font-size:13px;color:#6b7280;text-align:left;line-height:1.8}
+ .help code{background:#1e1e1e;padding:2px 6px;border-radius:4px;font-size:12px;color:#a78bfa}
+ .spinner{display:inline-block;width:16px;height:16px;border:2px solid #4b5563;border-top-color:#a78bfa;border-radius:50%;animation:spin .8s linear infinite;vertical-align:middle;margin-right:6px}
+ @keyframes spin{to{transform:rotate(360deg)}}
+ .raw-link{background:#1c1917;border:1px solid #44403c;border-radius:8px;padding:16px;margin-top:16px;text-align:left;display:none}
+ .raw-link.show{display:block}
+ .raw-link p{font-size:13px;color:#a8a29e;margin-bottom:4px}
+ .raw-link code{color:#fbbf24;font-size:12px;word-break:break-all}
+ </style>
+</head>
+<body>
+ <div class="container">
+ <div class="icon">⚡</div>
+ <h1>安装 Trae CN 插件</h1>
+ <div class="ext-name" id="extName"></div>
+ <div class="status" id="status"><span class="spinner"></span>正在唤起 Trae CN...</div>
+ <div id="actions" style="display:none">
+ <a class="btn" id="retryBtn" href="#">手动点击安装</a><br>
+ <button class="btn secondary" id="copyBtn">复制协议链接</button>
+ </div>
+ <div class="raw-link" id="rawBox">
+ <p>也可以手动在浏览器地址栏输入：</p>
+ <code id="rawLink"></code>
+ </div>
+ <div class="help">
+ <strong>没有自动打开？</strong><br>
+ 1. 确认 <code>Trae CN</code> 已安装且正在运行<br>
+ 2. 点击上方「手动点击安装」重试<br>
+ 3. 或复制链接粘贴到浏览器地址栏
+ </div>
+ </div>
+ <script>
+ (function(){
+ var DEFAULT_EXT='byted-extensions.promptblame';
+ var params=new URLSearchParams(window.location.search);
+ var extId=params.get('ext')||DEFAULT_EXT;
+ var url='trae-cn:extension/'+extId;
+ document.getElementById('extName').textContent=extId;
+ document.getElementById('retryBtn').href=url;
+ document.getElementById('rawLink').textContent=url;
+ var f=document.createElement('iframe');
+ f.style.display='none';f.src=url;document.body.appendChild(f);
+ setTimeout(function(){window.location.href=url},300);
+ setTimeout(function(){
+ document.getElementById('status').innerHTML='Trae CN 没有自动打开，请手动操作 ↓';
+ document.getElementById('status').className='status fail';
+ document.getElementById('actions').style.display='block';
+ document.getElementById('rawBox').className='raw-link show';
+ try{document.body.removeChild(f)}catch(e){}
+ },2500);
+ document.getElementById('copyBtn').addEventListener('click',function(){
+ var b=this;
+ navigator.clipboard.writeText(url).then(function(){
+ b.textContent='已复制 ✓';
+ setTimeout(function(){b.textContent='复制协议链接'},1500);
+ }).catch(function(){prompt('请手动复制：',url)});
+ });
+ })();
+ </script>
+</body>
+</html>
